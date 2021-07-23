@@ -1,0 +1,37 @@
+image: alpine:latest
+
+stages:
+  - build
+  - deploy
+  - test
+
+build:
+  stage: build
+  script: 
+    - echo 'Build complete'
+
+depoly:
+  stage: deploy
+  script:
+    - mkdir .public
+    - cp -r * .public
+    - mv .public public
+    - echo 'App deployed'
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+
+tosca:
+  stage: test
+  script:
+    - cd C:\gitlab\ToscaCIClient\
+    - .\ToscaCIClient.exe -m distributed -c "CITestExecutionConfiguration.xml"
+    - cp C:\gitlab\ToscaCIResults\result.xml $CI_PROJECT_DIR\ToscaCIResults.xml
+  artifacts:
+    when: always
+    reports:
+      junit: $CI_PROJECT_DIR\ToscaCIResults.xml
+  tags: 
+    - toscaci
